@@ -14,3 +14,6 @@ Julia packages used (can be installed from the notebook by uncommenting the rele
 
 
 For now there is no documentation, but it will come when I have more time.
+
+
+![Image of BinaryCounter]
