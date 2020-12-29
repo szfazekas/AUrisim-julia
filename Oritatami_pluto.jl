@@ -64,9 +64,9 @@ begin
 	shear = [1 -0.5;0 sqrt(3)/2]
 	
 	
-	gliderfile = "glider.auri.txt"
-	pyramidfile = "pyramid.auri.txt"
-	bincountfile = "bincount.auri.txt"
+	gliderfile = "sampleOS\\glider.auri.txt"
+	pyramidfile = "sampleOS\\pyramid.auri.txt"
+	bincountfile = "sampleOS\\bincount.auri.txt"
 	
 	md"""
 	Initialization of global variables
