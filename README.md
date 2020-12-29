@@ -13,7 +13,9 @@ The Jupyter notebook requires Jupyter:
 https://jupyter.org/
 
 The Pluto notebook uses the Pluto.jl package in Julia, so does not need external installation, but you need to install it along with the other package requirements.
-I will mostly focus on the Pluto notebook from now on, probably, because of its reactive nature and because the source file in the end is a valid Julia file, as opposed to the jupyter notebooks.
+I will mostly focus on the Pluto notebook from now on, probably, because of its reactive nature and because the source file in the end is a valid Julia file, as opposed to the Jupyter notebooks. In Pluto I found it much easier to set up the interactive controls, which is a key in this project. After opening the notebook and all cells finished loading you should see something like below (with fewer beads in the conformation).
+![Image of Pluto notebook](https://github.com/szfazekas/AUrisim-julia/blob/main/Screenshot1_pluto.png)
+
 
 To use the Oritatami-pluto notebook, you need to install the packages below, after installing Julia:
  - Pluto
