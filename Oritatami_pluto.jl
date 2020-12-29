@@ -15,229 +15,23 @@ end
 
 # ╔═╡ 1a12ca10-4391-11eb-38f3-475632625048
 begin
-	#using Pkg
-	#Pkg.add("Colors")
-	#Pkg.add("WGLMakie")
-	#Pkg.add("Colors")
 	using Pluto
 	using PlutoUI
 	using Plots
-	
 	using LightGraphs
 	using GraphPlot
-
-#	gr()
+	gr()
 	using Colors
 	using ColorSchemes
 	using GeometryTypes
-	#using GLMakie
-	#using GLMakie.AbstractPlotting
-	#using WGLMakie
-	#using WGLMakie.AbstractPlotting
-	
-	#AbstractPlotting.inline!(true)
-		
+	md"""
+	Importing used packages
+	"""
 end
-
-# ╔═╡ 93166c80-4861-11eb-2e9d-25075cdc8bf1
-md"""
-Initialization
-"""
-
-
-# ╔═╡ 4659a0d0-4391-11eb-08bc-5f0fa8380c40
-begin
-	
-	#delta = 2
-	#arity = 4
-	
-	#neighborhood = [(1,0), (1,1), (0,1), (-1,0), (-1,-1), (0,-1)]
-	
-	neighborhood = [[1,0], [1,1], [0,1], [-1,0], [-1,-1], [0,-1]]
-	
-	drawCount = 50
-	
-#	sigma = [1,2,1,2,3,1,2,1,3,3,2,1,1,2]
-	
-	#transcript = ["0","6","8","5","7","2","4","1","4","2","7","5","8","5","7","2","7","0","0"]
-	
-	#beads = Dict([((0,0),["0",[]]), ((-1,0),["2",[]]), ((0,1),["0",[]])])
-	
-	#beads = Dict([((0,0),["0",[]]), ((-1,0),["2",[]]), ((1,1),["2",[]]), ((0,1),["2",[]]), ((1,0),["2",[]]), ((-1,-1),["2",[]])])
-	#Dict([((0,1),["0",[]]),((0,2),["0",[]]),((-1,1),["0",[]]),((-1,0),["0",[]])])
-	
-	#beads = Dict()
-	
-	dirs = [[1,0], [0,1], [-1,1], [-1,0], [0,-1], [1,-1]]
-	
-	#hood =        [          (-2,2),   (-1,2),   (0,2),
-	#                     (-2,1),  (-1,1),   (0,1),    (1,1),
-	#                 (-2,0),  (-1,0),   (0,0),    (1,0),   (2,0),
-	#                     (-1,-1), (0,-1),   (1,-1),   (2,-1),
-	#                          (0,-2),   (1,-2),   (2,-2)]
-	
-	
-	hood =        [          [-2,2],   [-1,2],   [0,2],
-	                     [-2,1],  [-1,1],   [0,1],    [1,1],
-	                 [-2,0],  [-1,0],   [0,0],    [1,0],   [2,0],
-	                     [-1,-1], [0,-1],   [1,-1],   [2,-1],
-	                          [0,-2],   [1,-2],   [2,-2]]
-	
-	
-	perimeter = [hood[1], hood[2], hood[3], hood[7], 
-	             hood[12], hood[16], hood[19], hood[18], 
-	             hood[17], hood[13], hood[8], hood[4]]
-	
-	initpath1 = [(0,0),(1,0), (1,1)]
-	initpath2 = [(0,0),(1,0), (0,-1)]
-	initpath3 = [(0,0),(1,0), (2,0), (2,1)]
-	
-	#currentpath = []
-	#testpath = [np.array((0,1)),np.array((1,0)),np.array((1,-1)),np.array((0,-1)),np.array((-1,0)),np.array((-1,1)),np.array((0,0))]
-	
-	gridp = [[-2, 0], [-2, 1], [-2, 2], [-1, -1], [-1, 0], [-1, 1], [-1, 2], [0, -2], [0, -1], [0, 0], [0, 1], 
-	    [0, 2], [1, -2], [1, -1], [1, 0], [1, 1], [2, -2], [2, -1], [2, 0] ]
-	
-	shear = [1 -0.5;0 sqrt(3)/2]
-	
-	#rules = Dict([("0",["0","1"]),("1",["0","1"]),("2",[])])
-	
-	gliderfile = "..\\AUrisim-master\\glidersample.auri.txt"
-	pyramidfile = "..\\AUrisim-master\\pyramidsample.auri.txt"
-	bincountfile = "..\\AUrisim-master\\binCount.auri.txt"
-end
-
-# ╔═╡ 5ef33c50-4391-11eb-0042-131969fd46d8
-function loadOS(file)
-    io = open(file, read=true)
-    f = read(io,String)
-    close(io)
-
-	fbeads = Dict()
-	
-    os = split(f,"\n")
-
-    fdelta = parse(UInt8, os[1])
-
-    farity = parse(UInt8, os[2])
-
-    fseed = []
-
-    for fbeadstr in split(os[3],"->")
-        fbead = split(fbeadstr,",")
-        push!(fseed,[string(fbead[1]), parse(Int, fbead[2]), parse(Int, fbead[3])])
-    end
-    
-    for fbead in fseed
-        fbeads[[fbead[2],fbead[3]]] = [fbead[1],[]]
-    end
-    
-    ftranscript = split(strip(os[4]),",")
-
-    frules = Dict{String, Array{String}}()
-    for frule in split(os[5],",")
-        sides = split(frule, "=")
-        if haskey(frules, sides[1])
-            push!(frules[sides[1]], sides[2])
-        else
-            frules[sides[1]] = [sides[2]]
-        end
-
-        if haskey(frules, sides[2])
-            push!(frules[sides[2]], sides[1])
-        else
-            frules[sides[2]] = [sides[1]]
-        end
-    end
-    
-    return [fdelta, farity, fseed, ftranscript, frules, fbeads]
-end
-
-# ╔═╡ 64b5d850-4391-11eb-0830-b72530bbf57d
-function genComb(n, k)
-	if n < k || k < 0
-		return []
-    end
-	index = k
-	combos = []
-	comb = []
-
-	for i=1:k
-		push!(comb,i)
-    end
-    push!(combos,copy(comb))
-
-	while index > 0
-		if comb[index] < n-k+index
-			comb[index] += 1
-			for i=index+1:k
-				comb[i] = comb[i-1] + 1
-            end
-			push!(combos,copy(comb))
-			index = k
-		else
-			index -= 1
-        end
-    end
-	return combos
-end
-
-# ╔═╡ 50f39900-4392-11eb-33dc-0999c97ce6b2
-# generate all combinations of k elements from set, using genComb(|set|, k) above
-function genCombSet(set,k)
-	tmp = genComb(length(set), k)
-	combos = []
-	comb = []
-	for i in tmp
-		comb = []
-		for j in i
-			push!(comb,set[j])
-        end
-        push!(combos,copy(comb))
-    end
-	return combos
-end
-
-# ╔═╡ 50f5bbe0-4392-11eb-00c0-7191e55c2d31
-# generate Cartesian power k of set, recursively
-function genCartPower(set, k)
-	cart = []
-	if set == [] || k == 0
-		return [[]]
-    end
-	tmp = genCartPower(set, k-1)
-	for i in set
-		for j in tmp
-			push!(cart,push!(copy(j),i))
-        end
-    end
-	return cart
-end
-
-# ╔═╡ 51076f20-4392-11eb-1ce1-012c08accf88
-# generate Cartesian product of sets, recursively
-function genCart(sets)
-	cart = []
-	if sets == [] #|| getkey(sets,[],'x')=='x'
-		return [[]]
-    end
-	tmp = pop!(sets)
-	tmp2 = genCart(sets)
-
-	for i in tmp
-		for j in tmp2
-			push!(cart,append!([i],j))
-        end
-    end
-	return cart
-end
-
-# ╔═╡ e75a6ef0-484c-11eb-3be9-7bc26e01b28e
-cutoff = 5
 
 # ╔═╡ ea695dc0-492a-11eb-3e0e-41dea86a9123
 md"""
-Length of transcript to try to fold: $(@bind folding_length NumberField(0:5000, default=10))
+Length of conformation to try to fold (including the seed): $(@bind folding_length NumberField(0:5000, default=10))
 """
 
 # ╔═╡ f3b25b10-485e-11eb-0672-a56f14d5eaf9
@@ -245,6 +39,52 @@ md"""
 Size of the beads on the plot: $(@bind beadsize Slider(1:30,default=4, show_value=true))
 _______Width of plot: $(@bind canvaswidth Slider(200:100:1500, default=800, show_value=true))
 _______Height of plot: $(@bind canvasheight Slider(200:100:1200, default=400, show_value=true))
+"""
+
+# ╔═╡ 63c99630-48b8-11eb-3750-d3afc0eb2d36
+md"""
+Number of beads to plot: 
+$(@bind plotlimit Slider(1:folding_length; default=1, show_value=true))
+"""
+
+# ╔═╡ 4659a0d0-4391-11eb-08bc-5f0fa8380c40
+begin
+	
+	#delta = 2
+	#arity = 4
+	#transcript = ["0","6","8","5","7","2","4","1","4","2","7","5","8","5","7","2","7","0","0"]
+	#rules = Dict([("0",["0","1"]),("1",["0","1"]),("2",[])])
+	
+	cutoff = 5
+	
+	neighborhood = [[1,0], [1,1], [0,1], [-1,0], [-1,-1], [0,-1]]
+	
+	dirs = [[1,0], [0,1], [-1,1], [-1,0], [0,-1], [1,-1]]
+	
+	shear = [1 -0.5;0 sqrt(3)/2]
+	
+	
+	gliderfile = "..\\AUrisim-master\\glidersample.auri.txt"
+	pyramidfile = "..\\AUrisim-master\\pyramidsample.auri.txt"
+	bincountfile = "..\\AUrisim-master\\binCount.auri.txt"
+	
+	md"""
+	Initialization of global variables
+	"""
+end
+
+# ╔═╡ 65f4fca0-49b3-11eb-2ee4-072e50d481b5
+	md"""
+	The cell below sets up the page. If you want narrower/wider cells, change the value of max-width.
+	"""
+
+# ╔═╡ 79975630-4865-11eb-1c55-290ee27b9677
+html"""<style>
+main {
+	max-width: 1500px;
+	align-self: flex-start;
+	margin-left: 50px;
+}
 """
 
 # ╔═╡ 583db4d2-4391-11eb-2ae9-c73fd33c55a9
@@ -335,11 +175,51 @@ function plotPath(beads, fpath, fcolored, labels=[], anim=false, fbonds=[], limi
     end
 end
 
-# ╔═╡ 63c99630-48b8-11eb-3750-d3afc0eb2d36
-md"""
-Number of beads to plot: 
-$(@bind plotlimit Slider(1:folding_length; default=1, show_value=true))
-"""
+# ╔═╡ 5ef33c50-4391-11eb-0042-131969fd46d8
+function loadOS(file)
+    io = open(file, read=true)
+    f = read(io,String)
+    close(io)
+
+	fbeads = Dict()
+	
+    os = split(f,"\n")
+
+    fdelta = parse(UInt8, os[1])
+
+    farity = parse(UInt8, os[2])
+
+    fseed = []
+
+    for fbeadstr in split(os[3],"->")
+        fbead = split(fbeadstr,",")
+        push!(fseed,[string(fbead[1]), parse(Int, fbead[2]), parse(Int, fbead[3])])
+    end
+    
+    for fbead in fseed
+        fbeads[[fbead[2],fbead[3]]] = [fbead[1],[]]
+    end
+    
+    ftranscript = split(strip(os[4]),",")
+
+    frules = Dict{String, Array{String}}()
+    for frule in split(os[5],",")
+        sides = split(frule, "=")
+        if haskey(frules, sides[1])
+            push!(frules[sides[1]], sides[2])
+        else
+            frules[sides[1]] = [sides[2]]
+        end
+
+        if haskey(frules, sides[2])
+            push!(frules[sides[2]], sides[1])
+        else
+            frules[sides[2]] = [sides[1]]
+        end
+    end
+    
+    return [fdelta, farity, fseed, ftranscript, frules, fbeads]
+end
 
 # ╔═╡ 158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
 os = loadOS(bincountfile)
@@ -348,22 +228,6 @@ os = loadOS(bincountfile)
 
 # ╔═╡ 321fab30-484d-11eb-3a48-bb6a1827c51d
 delta = os[1]
-
-# ╔═╡ 51179bbe-4392-11eb-3f56-9be32cb5d542
-function generateDeltaPathFast(beads, path, trans)
-	dpath = [[copy(path)]]
-	for i=1 : delta - length(path)+1
-		push!(dpath,[])
-		for j in dpath[i]
-			for dir in neighborhood
-				if !(haskey(beads,last(j).+dir) || last(j).+dir in j)
-					push!(dpath[i+1], push!(copy(j),last(j).+dir))
-                end
-            end
-        end
-    end
-	return last(dpath)
-end
 
 # ╔═╡ 350984b0-484d-11eb-1d69-8725abe363a7
 arity = os[2]
@@ -380,25 +244,108 @@ period = length(transcript)
 # ╔═╡ 3d96d96e-484d-11eb-0293-b1e8656110fa
 rules = os[5]
 
-# ╔═╡ 14edea70-4980-11eb-24e1-0190280a9c1f
-begin
-	tmpkeys = []
-	for key in keys(rules)
-		push!(tmpkeys,key)
-	end
-	G = Graph(length(tmpkeys)) # graph with 3 vertices
-	for beadtype in 1:length(tmpkeys)
-		for neighbor in rules[tmpkeys[beadtype]]
-			add_edge!(G,beadtype,findfirst(isequal(neighbor),tmpkeys))
-		end
-	end
-	
-# make a triangle
-#add_edge!(G₁, 1, 2)
-#add_edge!(G₁, 1, 3)
-#add_edge!(G₁, 2, 3)
+# ╔═╡ fa566620-484d-11eb-08ea-cf27826e5d58
+startbeads = deepcopy(os[6])
 
-gplot(G,  layout=spectral_layout, nodelabel=tmpkeys)
+# ╔═╡ 46523bb0-4850-11eb-2c9b-5d7b5d828246
+path = [[bead[2], bead[3]] for bead in os[3]]
+
+# ╔═╡ 4cc0cf1e-4850-11eb-24e1-6107648b653b
+labels = [bead[1] for bead in os[3]]
+
+# ╔═╡ 64b5d850-4391-11eb-0830-b72530bbf57d
+function genComb(n, k)
+	if n < k || k < 0
+		return []
+    end
+	index = k
+	combos = []
+	comb = []
+
+	for i=1:k
+		push!(comb,i)
+    end
+    push!(combos,copy(comb))
+
+	while index > 0
+		if comb[index] < n-k+index
+			comb[index] += 1
+			for i=index+1:k
+				comb[i] = comb[i-1] + 1
+            end
+			push!(combos,copy(comb))
+			index = k
+		else
+			index -= 1
+        end
+    end
+	return combos
+end
+
+# ╔═╡ 50f39900-4392-11eb-33dc-0999c97ce6b2
+# generate all combinations of k elements from set, using genComb(|set|, k) above
+function genCombSet(set,k)
+	tmp = genComb(length(set), k)
+	combos = []
+	comb = []
+	for i in tmp
+		comb = []
+		for j in i
+			push!(comb,set[j])
+        end
+        push!(combos,copy(comb))
+    end
+	return combos
+end
+
+# ╔═╡ 50f5bbe0-4392-11eb-00c0-7191e55c2d31
+# generate Cartesian power k of set, recursively
+function genCartPower(set, k)
+	cart = []
+	if set == [] || k == 0
+		return [[]]
+    end
+	tmp = genCartPower(set, k-1)
+	for i in set
+		for j in tmp
+			push!(cart,push!(copy(j),i))
+        end
+    end
+	return cart
+end
+
+# ╔═╡ 51076f20-4392-11eb-1ce1-012c08accf88
+# generate Cartesian product of sets, recursively
+function genCart(sets)
+	cart = []
+	if sets == [] #|| getkey(sets,[],'x')=='x'
+		return [[]]
+    end
+	tmp = pop!(sets)
+	tmp2 = genCart(sets)
+
+	for i in tmp
+		for j in tmp2
+			push!(cart,append!([i],j))
+        end
+    end
+	return cart
+end
+
+# ╔═╡ 51179bbe-4392-11eb-3f56-9be32cb5d542
+function generateDeltaPathFast(beads, path, trans)
+	dpath = [[copy(path)]]
+	for i=1 : delta - length(path)+1
+		push!(dpath,[])
+		for j in dpath[i]
+			for dir in neighborhood
+				if !(haskey(beads,last(j).+dir) || last(j).+dir in j)
+					push!(dpath[i+1], push!(copy(j),last(j).+dir))
+                end
+            end
+        end
+    end
+	return last(dpath)
 end
 
 # ╔═╡ 6bcedc90-4391-11eb-0a02-f3a177f21c2c
@@ -635,10 +582,11 @@ function fold(fbeads, path, ftranscript, lastbead, labels, trlength)
 		
 	# FIRST STABILIZATION
     #***************************************
-	#tmp = findFirstFast(path[end],append!([os[3][end][1]], ftranscript[1:delta]))
+
 	tmp = findFirstFast(beads,path[end],append!([lastbead], ftranscript[1:delta]),bondset)
     # findFirstFast returns with an array containing elements [path,bondset-per-bead,strength-of-elongation]
-    if (tmp != []) && (arity >= cutoff)
+
+	if (tmp != []) && (arity >= cutoff)
         beads[tmp[1][1][2]] = [ftranscript[1],[]]
 
         for bond in tmp[1][2][1][1]
@@ -682,15 +630,10 @@ function fold(fbeads, path, ftranscript, lastbead, labels, trlength)
             for bond in tmp[1][2][1][1]
                 if tmp[1][1][2].+bond in keys(beads)
                     push!(beads[tmp[1][1][2]][2], tmp[1][1][2].+bond)
-					#return [bond, tmp[1]]
                 end
             end
             push!(path,tmp[1][1][2])
             push!(labels, tmptr[2])
-#        else
-#           println("Stop bead: ", i, "  Position: ", path[end], "  Transcript window: ", tmptr)
-#			break 
-#        end
 		
 		elseif (tmp != []) && (arity<cutoff)
 			beads[tmp[1][1][2]] = [tmptr[2],[]]
@@ -698,33 +641,19 @@ function fold(fbeads, path, ftranscript, lastbead, labels, trlength)
 			for bond in bondset[tmp[1][2][1][1]]
 					push!(beads[tmp[1][1][2]][2], tmp[1][1][2].+bond)
 					push!(beads[tmp[1][1][2].+bond][2], tmp[1][1][2])
-#					return bondset[tmp[1][2][1][1]]
 			end
 			push!(path,tmp[1][1][2])
 			push!(labels, tmptr[2])
+
 		else
 			error = "Last stabilized bead: $(i+1)     at position: $(path[end])               Next delay-size transcript window: $(join(tmptr[2:end]))"
 			break 
-			#print(path[end-delta:end], "    ", transcript[i:i+delta], "\n")
-			#print(beads, "\n")
 		end
     end
-
-    #plotPath2(scene, beads, path, labels)
-	
 	
 	return [beads, path, labels,error]
 end
 
-
-# ╔═╡ fa566620-484d-11eb-08ea-cf27826e5d58
-startbeads = deepcopy(os[6])
-
-# ╔═╡ 46523bb0-4850-11eb-2c9b-5d7b5d828246
-path = [[bead[2], bead[3]] for bead in os[3]]
-
-# ╔═╡ 4cc0cf1e-4850-11eb-24e1-6107648b653b
-labels = [bead[1] for bead in os[3]]
 
 # ╔═╡ 8b082da0-4391-11eb-1ee3-c70c33b4cf2e
 conformation = fold(startbeads, path, transcript, seed[end][1], labels, folding_length)
@@ -732,20 +661,29 @@ conformation = fold(startbeads, path, transcript, seed[end][1], labels, folding_
 # ╔═╡ 860d64f0-48b4-11eb-265a-8364e73badce
 plotPath(conformation[1], conformation[2], true, conformation[3], false, [], plotlimit)
 
-# ╔═╡ 79975630-4865-11eb-1c55-290ee27b9677
-html"""<style>
-main {
-    max-width: 1500px;
-    align-self: flex-start;
-    margin-left: 50px;
-}
-"""
-
 # ╔═╡ 6a63bc30-4865-11eb-0396-6d4ca5f1bb07
 
 
-# ╔═╡ 652808a0-4853-11eb-0dd7-cffac7eec737
+# ╔═╡ 92d8d6b0-49b3-11eb-2b82-07a4ab8dcaee
+md"""
+Some experimental stuff is in the cells below, like an alternative plotting and visualization for the rule graph. Not yet working ...
+"""
 
+# ╔═╡ 14edea70-4980-11eb-24e1-0190280a9c1f
+begin
+	tmpkeys = []
+	for key in keys(rules)
+		push!(tmpkeys,key)
+	end
+	G = Graph(length(tmpkeys)) # graph with 3 vertices
+	for beadtype in 1:length(tmpkeys)
+		for neighbor in rules[tmpkeys[beadtype]]
+			add_edge!(G,beadtype,findfirst(isequal(neighbor),tmpkeys))
+		end
+	end
+
+	#gplot(G,  nodelabel=tmpkeys)
+end
 
 # ╔═╡ 838baca0-4391-11eb-134d-e574e77f4911
 function plotPath2(scene, fbeads, fpath, labels)
@@ -836,10 +774,25 @@ function plotPath2(scene, fbeads, fpath, labels)
 end
 
 # ╔═╡ Cell order:
-# ╠═1a12ca10-4391-11eb-38f3-475632625048
-# ╠═14edea70-4980-11eb-24e1-0190280a9c1f
-# ╟─93166c80-4861-11eb-2e9d-25075cdc8bf1
+# ╟─ea695dc0-492a-11eb-3e0e-41dea86a9123
+# ╟─f3b25b10-485e-11eb-0672-a56f14d5eaf9
+# ╟─63c99630-48b8-11eb-3750-d3afc0eb2d36
+# ╟─860d64f0-48b4-11eb-265a-8364e73badce
+# ╠═158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
+# ╟─321fab30-484d-11eb-3a48-bb6a1827c51d
+# ╟─350984b0-484d-11eb-1d69-8725abe363a7
+# ╟─384771a0-484d-11eb-1407-07c7ab19508d
+# ╟─3b13d810-484d-11eb-0a83-b1982d8eb146
+# ╟─3d96d96e-484d-11eb-0293-b1e8656110fa
+# ╟─fa566620-484d-11eb-08ea-cf27826e5d58
+# ╟─46523bb0-4850-11eb-2c9b-5d7b5d828246
+# ╟─4cc0cf1e-4850-11eb-24e1-6107648b653b
+# ╟─450d50e0-4856-11eb-0275-13db9e520e93
+# ╟─8b082da0-4391-11eb-1ee3-c70c33b4cf2e
+# ╟─1a12ca10-4391-11eb-38f3-475632625048
 # ╟─4659a0d0-4391-11eb-08bc-5f0fa8380c40
+# ╟─65f4fca0-49b3-11eb-2ee4-072e50d481b5
+# ╠═79975630-4865-11eb-1c55-290ee27b9677
 # ╟─51206ad0-4391-11eb-3d4c-3ba8cbc17a60
 # ╟─583db4d2-4391-11eb-2ae9-c73fd33c55a9
 # ╟─5ef33c50-4391-11eb-0042-131969fd46d8
@@ -852,23 +805,7 @@ end
 # ╟─71271e00-4391-11eb-0c2e-f1fd75922269
 # ╟─76874eb0-4391-11eb-21bb-e52da6d0c4fd
 # ╟─7bfd9f70-4391-11eb-02d7-5f825523ddec
-# ╟─e75a6ef0-484c-11eb-3be9-7bc26e01b28e
-# ╟─321fab30-484d-11eb-3a48-bb6a1827c51d
-# ╟─350984b0-484d-11eb-1d69-8725abe363a7
-# ╟─384771a0-484d-11eb-1407-07c7ab19508d
-# ╟─3b13d810-484d-11eb-0a83-b1982d8eb146
-# ╟─3d96d96e-484d-11eb-0293-b1e8656110fa
-# ╟─fa566620-484d-11eb-08ea-cf27826e5d58
-# ╟─46523bb0-4850-11eb-2c9b-5d7b5d828246
-# ╟─4cc0cf1e-4850-11eb-24e1-6107648b653b
-# ╟─450d50e0-4856-11eb-0275-13db9e520e93
-# ╟─8b082da0-4391-11eb-1ee3-c70c33b4cf2e
-# ╟─ea695dc0-492a-11eb-3e0e-41dea86a9123
-# ╟─f3b25b10-485e-11eb-0672-a56f14d5eaf9
-# ╟─63c99630-48b8-11eb-3750-d3afc0eb2d36
-# ╟─860d64f0-48b4-11eb-265a-8364e73badce
-# ╠═158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
-# ╠═79975630-4865-11eb-1c55-290ee27b9677
 # ╠═6a63bc30-4865-11eb-0396-6d4ca5f1bb07
-# ╠═652808a0-4853-11eb-0dd7-cffac7eec737
+# ╟─92d8d6b0-49b3-11eb-2b82-07a4ab8dcaee
+# ╟─14edea70-4980-11eb-24e1-0190280a9c1f
 # ╟─838baca0-4391-11eb-134d-e574e77f4911
