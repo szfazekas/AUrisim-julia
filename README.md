@@ -29,7 +29,8 @@ Then, you can install the package called PackageName with the command
 
 After installing the packages, the following two commands run Pluto, where you can open the notebook **Oritatami-pluto.jl** and start folding :)
 > import Pluto
-  Pluto.run()
+
+> Pluto.run()
 
 
 Julia packages used in the Jupyter notebook (can be installed from the notebook by uncommenting the relevant lines in the first cell):
