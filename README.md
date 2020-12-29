@@ -2,7 +2,7 @@
 # An Oritatami systems simulator written in Julia
 
 The goal of this project is to create an easy to use interactive simulator for Oritatami systems.
-These systems were introduced by Cody Geary, Olivier Meunier, Nicolas Schabanel and Shinnosuke Seki as a mathematical model of engineering shapes by exploiting the cotransciptional of RNA. The papers that started the field are [Geary16](https://science.sciencemag.org/content/345/6198/799.abstract) and [GMSS16](https://drops.dagstuhl.de/opus/volltexte/2016/6456/pdf/LIPIcs-MFCS-2016-43.pdf). For a recent paper, see, e.g., the one on the  [infinite binary counter](https://link.springer.com/chapter/10.1007/978-3-030-38919-2_46), which can be loaded from the file bincount.auri.txt.
+These systems were introduced by Cody Geary, Olivier Meunier, Nicolas Schabanel and Shinnosuke Seki as a mathematical model of engineering shapes by exploiting the cotransciptional of RNA. The papers that started the field are [Geary14](https://science.sciencemag.org/content/345/6198/799.abstract) and [GMSS16](https://drops.dagstuhl.de/opus/volltexte/2016/6456/pdf/LIPIcs-MFCS-2016-43.pdf). For a recent paper, see, e.g., the one on the  [infinite binary counter](https://link.springer.com/chapter/10.1007/978-3-030-38919-2_46), which can be loaded from the file bincount.auri.txt.
 
 There are two notebooks now, a Jupyter notebook and a Pluto.jl notebook.
 
