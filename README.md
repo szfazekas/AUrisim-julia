@@ -28,8 +28,7 @@ Then, you can install the package called PackageName with the command
 > Pkg.add("PackageName")
 
 After installing the packages, the following two commands run Pluto, where you can open the notebook **Oritatami-pluto.jl** and start folding :)
-> import Pluto
-
+> import Pluto  
 > Pluto.run()
 
 
