@@ -31,6 +31,7 @@ After installing the packages, the following two commands run Pluto, where you c
 > import Pluto  
 > Pluto.run()
 
+-------------------------------------------------------
 
 Julia packages used in the Jupyter notebook (can be installed from the notebook by uncommenting the relevant lines in the first cell):
 - Plots
