@@ -21,10 +21,10 @@ To use the Oritatami-pluto notebook, you need to install the packages below, aft
  - Pluto
  - PlutoUI
  - Plots
+ - GR
  - Colors
  - ColorSchemes
- - LightGraphs
- - GraphPlot
+
 
 To install the packages, you need to run
 > using Pkg
