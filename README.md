@@ -36,6 +36,8 @@ After installing the packages, the following two commands run Pluto, where you c
 > import Pluto  
 > Pluto.run()
 
+Here is a short [video guide](https://youtu.be/OBOtdvxGfes) on how to set up and run the Pluto notebook for the first time.
+
 -------------------------------------------------------
 
 Julia packages used in the Jupyter notebook (can be installed from the notebook by uncommenting the relevant lines in the first cell):
