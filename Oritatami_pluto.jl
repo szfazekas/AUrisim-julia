@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.12
+# v0.12.18
 
 using Markdown
 using InteractiveUtils
@@ -20,7 +20,6 @@ begin
 	using Plots
 	using LightGraphs
 	using GraphPlot
-	gr()
 	using Colors
 	using ColorSchemes
 	using GeometryTypes
@@ -32,6 +31,9 @@ end
 # ╔═╡ ea695dc0-492a-11eb-3e0e-41dea86a9123
 md"""
 Length of conformation to try to fold (including the seed): $(@bind folding_length NumberField(0:5000, default=10))
+_          _
+Plotting backend: $(@bind backend Select(["gr" => "GR", "plotly" => "plotly"]))
+
 """
 
 # ╔═╡ f3b25b10-485e-11eb-0672-a56f14d5eaf9
@@ -46,6 +48,13 @@ md"""
 Number of beads to plot: 
 $(@bind plotlimit Slider(1:folding_length; default=1, show_value=true))
 """
+
+# ╔═╡ 07cf29ee-4b31-11eb-3740-07c6145ffafd
+if backend == "gr"
+	gr()
+else
+	plotly()
+end
 
 # ╔═╡ 4659a0d0-4391-11eb-08bc-5f0fa8380c40
 begin
@@ -81,7 +90,7 @@ end
 # ╔═╡ 79975630-4865-11eb-1c55-290ee27b9677
 html"""<style>
 main {
-	max-width: 1500px;
+	max-width: 1200px;
 	align-self: flex-start;
 	margin-left: 50px;
 }
@@ -89,7 +98,12 @@ main {
 
 # ╔═╡ 583db4d2-4391-11eb-2ae9-c73fd33c55a9
 function plotPath(beads, fpath, fcolored, labels=[], anim=false, fbonds=[], limit=1)
-    tmp1 = []
+    tmp1 = Array{Float16,2}(undef,limit,2)
+	#tmp1 = []
+	tmp2 = Array{Float16,1}(undef, 2)
+	from = Array{Float16,1}(undef,2)
+	to = Array{Float16,1}(undef,2)
+	
 	bonds = deepcopy(fbonds)
     minx = maxx = fpath[1][1]
     miny = maxy = fpath[1][2]
@@ -122,15 +136,16 @@ function plotPath(beads, fpath, fcolored, labels=[], anim=false, fbonds=[], limi
     end
 
     for i=1:limit
-        push!(tmp1,shear*[fpath[i][1],fpath[i][2]])
+        #push!(tmp1,shear*[fpath[i][1],fpath[i][2]])
+		tmp2 = shear*[fpath[i][1],fpath[i][2]]
+		tmp1[i, 1] = tmp2[1]
+		tmp1[i, 2] = tmp2[2]
     end
     
-    tmp = [GeometryTypes.Point2f0(bead[1], bead[2]) for bead in tmp1]
-	
-    plt = plot(tmp, color = RGBA(0.1,0.1,0.1,0.8), linewidth = 3)
-    scatter!(tmp, 
+	plt = plot(tmp1[1:end,1], tmp1[1:end,2], color = RGBA(0.1,0.1,0.1,0.8), linewidth = 3, size = (canvaswidth, canvasheight))
+    scatter!(tmp1[1:end,1], tmp1[1:end,2], 
         color = fcolorpath,
-        size = (canvaswidth, canvasheight),
+#        size = (canvaswidth, canvasheight),
         aspect_ratio=:equal, 
 #        grid=false, 
         marker = :hexagon,
@@ -144,12 +159,6 @@ function plotPath(beads, fpath, fcolored, labels=[], anim=false, fbonds=[], limi
         )
 #        linecolor = :black)
     
-#	for bead in keys(beads)
-#        for bond in beads[bead][2]
-#            push!(bonds, [bead, bond])
-#        end
-#    end
-    
 	for bead in fpath[1:limit]
         for bond in beads[bead][2]
 			if bond in fpath[1:limit]
@@ -160,10 +169,9 @@ function plotPath(beads, fpath, fcolored, labels=[], anim=false, fbonds=[], limi
 	
 	
     for bond in bonds
-        from = GeometryTypes.Point2f0(shear*bond[1])
-        to = GeometryTypes.Point2f0(shear*bond[2])
-
-        plot!([from+(to-from)/3, to - (to-from)/3],
+        from = shear*bond[1]
+        to = shear*bond[2]
+        plot!([(from+(to-from)/3)[1], (to - (to-from)/3)[1]],[(from+(to-from)/3)[2], (to - (to-from)/3)[2]],
             color = :red,
 			linewidth = 1,
 			legend = :none
@@ -171,7 +179,6 @@ function plotPath(beads, fpath, fcolored, labels=[], anim=false, fbonds=[], limi
     end
     if anim == false
         return plt
-		#return bonds
     end
 end
 
@@ -666,112 +673,8 @@ plotPath(conformation[1], conformation[2], true, conformation[3], false, [], plo
 
 # ╔═╡ 92d8d6b0-49b3-11eb-2b82-07a4ab8dcaee
 md"""
-Some experimental stuff is in the cells below, like an alternative plotting and visualization for the rule graph. Not yet working ...
+Some experimental stuff will be in the cells below, like an alternative plotting and visualization for the rule graph. Not yet working ...
 """
-
-# ╔═╡ 14edea70-4980-11eb-24e1-0190280a9c1f
-begin
-	tmpkeys = []
-	for key in keys(rules)
-		push!(tmpkeys,key)
-	end
-	G = Graph(length(tmpkeys)) # graph with 3 vertices
-	for beadtype in 1:length(tmpkeys)
-		for neighbor in rules[tmpkeys[beadtype]]
-			add_edge!(G,beadtype,findfirst(isequal(neighbor),tmpkeys))
-		end
-	end
-
-	#gplot(G,  nodelabel=tmpkeys)
-end
-
-# ╔═╡ 838baca0-4391-11eb-134d-e574e77f4911
-function plotPath2(scene, fbeads, fpath, labels)
-
-#    for i=1:length(fpath)
-#        push!(xpath,shear*[fpath[i][1],fpath[i][2]])
-#    end
-    xpath = [GeometryTypes.Point2f0(shear*bead) for bead in fpath]
-
-    fcolors = colorschemes[:tab20]
-    fcolorpath = []
-    fbeadtypes = Dict()
-    fbeadtypecount = 0
-    minx = 0
-    maxx = 0
-    miny = 0
-    maxy = 0
-    
-    
-    for i=1:length(fpath)
-        if fpath[i][1] < minx
-            minx = fpath[i][1]
-        elseif fpath[i][1]>maxx
-            maxx = fpath[i][1]
-        end
-        if fpath[i][2] < miny
-            miny = fpath[i][2]
-        elseif fpath[i][2]>maxy
-            maxy = fpath[i][2]
-        end
-    end
-    
-    for i=1:length(xpath)
-        if !(labels[i] in keys(fbeadtypes))
-            fbeadtypes[labels[i]] = fbeadtypecount+1
-            fbeadtypecount += 1
-        end
-    end
-
-
-    for i=1:length(xpath)
-        push!(fcolorpath, 1+mod(fbeadtypes[labels[i]],20))
-    end
-    
-    
-
-
-    lines!(scene, xpath, color = RGBA(0.1,0.1,0.1,0.8), linewidth = 3)
-    scatter!(scene, xpath,
-    #        Aspect(1,1),
-            color = fcolors[fcolorpath],
-    #        colormap = :tab20,
-    #        color = :black)
-    #        size = (1800, 800),
-    #        aspect_ratio=:equal, 
-    #        grid=false, 
-            marker = :hexagon,
-            markersize = 16/(abs(maxx-minx)/70))
-    #        xlims = (minx-1,maxx+3),
-    #        ylims = (-15,15))
-    #        xticks = 0:1:10,
-    #        linealpha = 0.5,
-    #        linewidth = 3,
-    #        linecolor = RGBA{Float32}(0.10,0.10,0.10,1)
-
-    #ylims!(oritatami,(-10,10))
-    
-    bonds = []
-    
-    for bead in keys(fbeads)
-        for bond in fbeads[bead][2]
-            push!(bonds, [bead, bond])
-        end
-    end
-    
-    for bond in bonds
-        from = GeometryTypes.Point2f0(shear*bond[1])
-        to = GeometryTypes.Point2f0(shear*bond[2])
-#        pl = plot!([tmp1[1],tmp2[1]], [tmp1[2],tmp2[2]],
-        linesegments!(scene, [from+(to-from)/3, to - (to-from)/3], color = :red)
-    end
-#    if anim == false
-#        display(scene)
-#    end
-    
-    ylims!(scene, (miny-(maxx-minx-2*maxy+2*miny)/2, maxy + (maxx-minx-2*maxy+2*miny)/2))
-    display(scene)
-end
 
 # ╔═╡ Cell order:
 # ╟─ea695dc0-492a-11eb-3e0e-41dea86a9123
@@ -790,11 +693,12 @@ end
 # ╟─450d50e0-4856-11eb-0275-13db9e520e93
 # ╠═8b082da0-4391-11eb-1ee3-c70c33b4cf2e
 # ╟─1a12ca10-4391-11eb-38f3-475632625048
+# ╟─07cf29ee-4b31-11eb-3740-07c6145ffafd
 # ╟─4659a0d0-4391-11eb-08bc-5f0fa8380c40
 # ╟─65f4fca0-49b3-11eb-2ee4-072e50d481b5
 # ╠═79975630-4865-11eb-1c55-290ee27b9677
-# ╠═51206ad0-4391-11eb-3d4c-3ba8cbc17a60
-# ╟─583db4d2-4391-11eb-2ae9-c73fd33c55a9
+# ╟─51206ad0-4391-11eb-3d4c-3ba8cbc17a60
+# ╠═583db4d2-4391-11eb-2ae9-c73fd33c55a9
 # ╟─5ef33c50-4391-11eb-0042-131969fd46d8
 # ╟─64b5d850-4391-11eb-0830-b72530bbf57d
 # ╟─50f39900-4392-11eb-33dc-0999c97ce6b2
@@ -807,5 +711,3 @@ end
 # ╟─7bfd9f70-4391-11eb-02d7-5f825523ddec
 # ╠═6a63bc30-4865-11eb-0396-6d4ca5f1bb07
 # ╟─92d8d6b0-49b3-11eb-2b82-07a4ab8dcaee
-# ╟─14edea70-4980-11eb-24e1-0190280a9c1f
-# ╟─838baca0-4391-11eb-134d-e574e77f4911
