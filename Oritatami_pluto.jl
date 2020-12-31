@@ -18,11 +18,8 @@ begin
 	using Pluto
 	using PlutoUI
 	using Plots
-	using LightGraphs
-	using GraphPlot
 	using Colors
 	using ColorSchemes
-	using GeometryTypes
 	md"""
 	Importing used packages
 	"""
