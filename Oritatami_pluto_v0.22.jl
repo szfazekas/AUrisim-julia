@@ -97,6 +97,7 @@ begin
 	pyramidfile = "sampleOS\\pyramid.auri.txt"
 	bincountfile = "sampleOS\\bincount.auri.txt"
 	dist3file = "sampleOS\\d1a1dist3.auri.txt"
+	d1a1lowerboundfile = "sampleOS\\d1a1lowerbound.txt"
 	
 	if backend == "gr"
 		gr()
@@ -418,7 +419,8 @@ end
 # ╔═╡ 158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
 begin
 	if osdef == "fromfile"
-		os = loadOS(dist3file)
+		#os = loadOS(dist3file)
+		os = loadOS(d1a1lowerboundfile)
 		#os = loadOS(bincountfile)
 		#os = loadOS(pyramidfile)
 		#os = loadOS(gliderfile)
@@ -1383,7 +1385,7 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─fa566620-484d-11eb-08ea-cf27826e5d58
 # ╠═8b082da0-4391-11eb-1ee3-c70c33b4cf2e
 # ╟─1a12ca10-4391-11eb-38f3-475632625048
-# ╟─4659a0d0-4391-11eb-08bc-5f0fa8380c40
+# ╠═4659a0d0-4391-11eb-08bc-5f0fa8380c40
 # ╟─65f4fca0-49b3-11eb-2ee4-072e50d481b5
 # ╠═79975630-4865-11eb-1c55-290ee27b9677
 # ╟─583db4d2-4391-11eb-2ae9-c73fd33c55a9
