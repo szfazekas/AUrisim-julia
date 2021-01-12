@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.18
+# v0.12.17
 
 using Markdown
 using InteractiveUtils
@@ -461,6 +461,7 @@ end
 
 # ╔═╡ 158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
 begin
+	tmp = folding_length
 	if osdef == "fromfile"
 		#os = loadOS(dist3file)
 		#os = loadOS(d1a1lowerboundfile)
@@ -1429,7 +1430,7 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─4d0b8820-5553-11eb-11b8-995a6ca7a63f
 # ╟─cdd4c180-554c-11eb-3ac2-e125041e5bbe
 # ╠═860d64f0-48b4-11eb-265a-8364e73badce
-# ╠═158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
+# ╟─158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
 # ╟─00571140-53ee-11eb-26aa-e552dc854708
 # ╟─b4544440-5553-11eb-2984-f971c7ed1367
 # ╟─c449a7a0-5553-11eb-2d11-49cd2b88adcb
@@ -1450,7 +1451,7 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─65f4fca0-49b3-11eb-2ee4-072e50d481b5
 # ╠═79975630-4865-11eb-1c55-290ee27b9677
 # ╟─042f7f40-5548-11eb-0f48-7bb3efca4051
-# ╠═583db4d2-4391-11eb-2ae9-c73fd33c55a9
+# ╟─583db4d2-4391-11eb-2ae9-c73fd33c55a9
 # ╟─5ef33c50-4391-11eb-0042-131969fd46d8
 # ╟─64b5d850-4391-11eb-0830-b72530bbf57d
 # ╟─50f39900-4392-11eb-33dc-0999c97ce6b2
