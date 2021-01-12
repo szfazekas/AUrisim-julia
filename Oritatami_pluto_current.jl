@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.18
+# v0.12.17
 
 using Markdown
 using InteractiveUtils
@@ -45,23 +45,30 @@ Size of the beads on the plot: $(@bind beadsize Slider(1:30,default=4, show_valu
 ``~~~~~~~~~~~~~~~~~~`` Height of plot: $(@bind canvasheight Slider(200:100:1200, default=400, show_value=true))
 """
 
-# ╔═╡ 63c99630-48b8-11eb-3750-d3afc0eb2d36
-md"""
-Number of beads to plot: 
-$(@bind plotlimit Slider(1:folding_length; default=1, show_value=true))
-"""
-
 # ╔═╡ 00571140-53ee-11eb-26aa-e552dc854708
 md"""
 ### For manual set up of OS   
 Delta: $(@bind celldelta NumberField(1:12, default=3))
-``~~~~~~~~~~~~~~~~~~~~~~~~~``
+
+"""
+
+# ╔═╡ b4544440-5553-11eb-2984-f971c7ed1367
+md"""
 Arity: $(@bind cellarity NumberField(1:5, default=1))
+"""
 
+# ╔═╡ c449a7a0-5553-11eb-2d11-49cd2b88adcb
+md"""
 Seed: $(@bind seedtext TextField((100,1),default="0,-1,1->0,-1,0->1,0,1->0,0,0->5,-1,-1"))
+"""
 
+# ╔═╡ ced9d140-5553-11eb-1bcb-555b3a03da53
+md"""
 Transcript: $(@bind transcripttext TextField((100,1), default="3,0,4,1,0,5"))
+"""
 
+# ╔═╡ d7870a12-5553-11eb-0985-c155f32da81f
+md"""
 Rules: $(@bind rulestext TextField((100,1),default="1=4,3=5"))
 """
 
@@ -75,12 +82,6 @@ md"""
 
 # ╔═╡ 4659a0d0-4391-11eb-08bc-5f0fa8380c40
 begin
-	
-	#delta = 2
-	#arity = 4
-	#transcript = ["0","6","8","5","7","2","4","1","4","2","7","5","8","5","7","2","7","0","0"]
-	#rules = Dict([("0",["0","1"]),("1",["0","1"]),("2",[])])
-	
 	cutoff = 5
 	
 	#neighborhood = [[1,0], [1,1], [0,1], [-1,0], [-1,-1], [0,-1]]
@@ -93,15 +94,10 @@ begin
 	shear = [1 -0.5;0 sqrt(3)/2]
 	
 	
-	#gliderfile = "https://github.com/szfazekas/AUrisim-julia/blob/main/sampleOS/glider.auri.txt"
 	gliderfile = "sampleOS/glider.auri.txt"
-	#pyramidfile = "https://github.com/szfazekas/AUrisim-julia/blob/main/sampleOS/pyramid.auri.txt"
 	pyramidfile = "sampleOS/pyramid.auri.txt"
-	#bincountfile = "https://github.com/szfazekas/AUrisim-julia/blob/main/sampleOS/bincount.auri.txt"
 	bincountfile = "sampleOS/bincount.auri.txt"
-	#dist3file = "https://github.com/szfazekas/AUrisim-julia/blob/main/sampleOS/d1a1dist3.auri.txt"
 	dist3file = "sampleOS/d1a1dist3.auri.txt"
-	#d1a1lowerboundfile = "https://github.com/szfazekas/AUrisim-julia/blob/main/sampleOS/d1a1lowerbound.txt"
 	d1a1lowerboundfile = "sampleOS/d1a1lowerbound.txt"
 	
 	if backend == "gr"
@@ -127,6 +123,48 @@ main {
 	align-self: flex-start;
 	margin-left: 50px;
 }
+"""
+
+# ╔═╡ 042f7f40-5548-11eb-0f48-7bb3efca4051
+html"""
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+.slidecontainer {
+  width: 100%;
+}
+
+.slider1 {
+  -webkit-appearance: none;
+  width: 90%;
+  height: 10px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  min:1;
+  max:$(folding_length)
+}
+
+.slider1:hover {
+  opacity: 1;
+}
+
+.slider1::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+
+</style>
+</head>
 """
 
 # ╔═╡ 64b5d850-4391-11eb-0830-b72530bbf57d
@@ -423,10 +461,11 @@ end
 
 # ╔═╡ 158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
 begin
+	tmp = folding_length
 	if osdef == "fromfile"
 		#os = loadOS(dist3file)
-		os = loadOS(d1a1lowerboundfile)
-		#os = loadOS(bincountfile)
+		#os = loadOS(d1a1lowerboundfile)
+		os = loadOS(bincountfile)
 		#os = loadOS(pyramidfile)
 		#os = loadOS(gliderfile)
 	else
@@ -465,6 +504,18 @@ arity = os[2]
 
 # ╔═╡ 384771a0-484d-11eb-1407-07c7ab19508d
 seed = os[3]
+
+# ╔═╡ cdd4c180-554c-11eb-3ac2-e125041e5bbe
+wideslider=HTML("<input type=\"range\"  min=\"1\" max=\"$folding_length\" value=\"$(length(seed))\" class=\"slider1\" id=\"myRange\">");
+
+# ╔═╡ 4d0b8820-5553-11eb-11b8-995a6ca7a63f
+@bind plotlimit wideslider
+
+# ╔═╡ 63c99630-48b8-11eb-3750-d3afc0eb2d36
+md"""
+Number of beads to plot: $plotlimit
+"""
+#@bind plotlimit Slider(1:folding_length; default=1, show_value=true)
 
 # ╔═╡ 3b13d810-484d-11eb-0a83-b1982d8eb146
 transcript = Vector{String}(os[4])
@@ -1376,9 +1427,15 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─ea695dc0-492a-11eb-3e0e-41dea86a9123
 # ╟─f3b25b10-485e-11eb-0672-a56f14d5eaf9
 # ╟─63c99630-48b8-11eb-3750-d3afc0eb2d36
+# ╟─4d0b8820-5553-11eb-11b8-995a6ca7a63f
+# ╟─cdd4c180-554c-11eb-3ac2-e125041e5bbe
 # ╠═860d64f0-48b4-11eb-265a-8364e73badce
-# ╠═158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
+# ╟─158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
 # ╟─00571140-53ee-11eb-26aa-e552dc854708
+# ╟─b4544440-5553-11eb-2984-f971c7ed1367
+# ╟─c449a7a0-5553-11eb-2d11-49cd2b88adcb
+# ╟─ced9d140-5553-11eb-1bcb-555b3a03da53
+# ╟─d7870a12-5553-11eb-0985-c155f32da81f
 # ╟─d3ebb0a0-53ef-11eb-14ac-cf6c636d6dad
 # ╠═2d028b50-53f0-11eb-1f6d-9757a5b16ae4
 # ╟─85206b10-5042-11eb-3cd7-0167883de0ae
@@ -1389,10 +1446,11 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─3d96d96e-484d-11eb-0293-b1e8656110fa
 # ╟─fa566620-484d-11eb-08ea-cf27826e5d58
 # ╠═8b082da0-4391-11eb-1ee3-c70c33b4cf2e
-# ╠═1a12ca10-4391-11eb-38f3-475632625048
-# ╠═4659a0d0-4391-11eb-08bc-5f0fa8380c40
+# ╟─1a12ca10-4391-11eb-38f3-475632625048
+# ╟─4659a0d0-4391-11eb-08bc-5f0fa8380c40
 # ╟─65f4fca0-49b3-11eb-2ee4-072e50d481b5
 # ╠═79975630-4865-11eb-1c55-290ee27b9677
+# ╟─042f7f40-5548-11eb-0f48-7bb3efca4051
 # ╟─583db4d2-4391-11eb-2ae9-c73fd33c55a9
 # ╟─5ef33c50-4391-11eb-0042-131969fd46d8
 # ╟─64b5d850-4391-11eb-0830-b72530bbf57d
