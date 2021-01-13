@@ -94,11 +94,11 @@ begin
 	shear = [1 -0.5;0 sqrt(3)/2]
 	
 	
-	gliderfile = "sampleOS\\glider.auri.txt"
-	pyramidfile = "sampleOS\\pyramid.auri.txt"
-	bincountfile = "sampleOS\\bincount.auri.txt"
-	dist3file = "sampleOS\\d1a1dist3.auri.txt"
-	d1a1lowerboundfile = "sampleOS\\d1a1lowerbound.txt"
+	gliderfile = "sampleOS/glider.auri.txt"
+	pyramidfile = "sampleOS/pyramid.auri.txt"
+	bincountfile = "sampleOS/bincount.auri.txt"
+	dist3file = "sampleOS/d1a1dist3.auri.txt"
+	d1a1lowerboundfile = "sampleOS/d1a1lowerbound.txt"
 	
 	if backend == "gr"
 		gr()
@@ -1450,7 +1450,7 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─65f4fca0-49b3-11eb-2ee4-072e50d481b5
 # ╠═79975630-4865-11eb-1c55-290ee27b9677
 # ╟─042f7f40-5548-11eb-0f48-7bb3efca4051
-# ╟─583db4d2-4391-11eb-2ae9-c73fd33c55a9
+# ╠═583db4d2-4391-11eb-2ae9-c73fd33c55a9
 # ╟─5ef33c50-4391-11eb-0042-131969fd46d8
 # ╟─64b5d850-4391-11eb-0830-b72530bbf57d
 # ╟─50f39900-4392-11eb-33dc-0999c97ce6b2
