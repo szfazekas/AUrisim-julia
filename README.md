@@ -36,6 +36,14 @@ After installing the packages, the following two commands run Pluto, where you c
 > import Pluto  
 > Pluto.run()
 
+The latest functioning version will be under the name Oritatami_pluto_current.jl.
+I may upload newer versions, but they will become current only when they work.
+
+#UPDATE v.0.3
+
+- The interface changed a little: the slider for the number of beads to fold is much wider now to make it easier to pinpoint a specific conformation size by the mouse.
+- Now if you change the number of beads to fold (top right corner), the plot should automatically refresh; wait a little until that happens.
+- There are new examples added from our paper on delay 1, arity 1 systems.
 
 -------------------------------------------------------
 
