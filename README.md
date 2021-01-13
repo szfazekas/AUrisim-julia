@@ -1,4 +1,4 @@
-## AUrisim-julia
+# AUrisim-julia
 # An Oritatami systems simulator written in Julia
 
 The goal of this project is to create an easy to use interactive simulator for Oritatami systems.
@@ -39,7 +39,7 @@ After installing the packages, the following two commands run Pluto, where you c
 The latest functioning version will be under the name Oritatami_pluto_current.jl.
 I may upload newer versions, but they will become current only when they work.
 
-# UPDATE v.0.3
+## UPDATE v.0.3
 
 - The interface changed a little: the slider for the number of beads to fold is much wider now to make it easier to pinpoint a specific conformation size by the mouse.
 - Now if you change the number of beads to fold (top right corner), the plot should automatically refresh; wait a little until that happens.
