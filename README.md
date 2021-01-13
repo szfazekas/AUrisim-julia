@@ -17,7 +17,8 @@ https://jupyter.org/
 The Pluto notebook uses the Pluto.jl package in Julia, so does not need external installation, but you need to install it along with the other package requirements.
 I will probably focus on the Pluto notebook from now on, because of its reactive nature and because the source file in the end is a valid Julia file, as opposed to the Jupyter notebooks. In Pluto I found it much easier to set up the interactive controls, which is key in this project.  
 
-After opening the notebook and all cells finished loading you should see something like below (the interface might change a little with subsequent versions).
+After opening the notebook and all cells finished loading you should see something like below (the interface might change a little with subsequent versions). Clicking on the image will open a short video guide to installing the necessary packages.
+
 [![Video guide to running the PLuto notebook](https://github.com/szfazekas/AUrisim-julia/blob/main/Screenshot1_pluto.png)](https://youtu.be/Q6COatnYR4s)
 
 
