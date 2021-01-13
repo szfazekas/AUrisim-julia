@@ -12,6 +12,8 @@ https://julialang.org/
 The Jupyter notebook requires Jupyter: 
 https://jupyter.org/
 
+## The Pluto notebook
+
 The Pluto notebook uses the Pluto.jl package in Julia, so does not need external installation, but you need to install it along with the other package requirements.
 I will mostly focus on the Pluto notebook from now on, probably, because of its reactive nature and because the source file in the end is a valid Julia file, as opposed to the Jupyter notebooks. In Pluto I found it much easier to set up the interactive controls, which is a key in this project. After opening the notebook and all cells finished loading you should see something like below (with fewer beads in the conformation).
 [![Video guide to running the PLuto notebook](https://github.com/szfazekas/AUrisim-julia/blob/main/Screenshot1_pluto.png)](https://youtu.be/Q6COatnYR4s)
@@ -39,13 +41,15 @@ After installing the packages, the following two commands run Pluto, where you c
 The latest functioning version will be under the name Oritatami_pluto_current.jl.
 I may upload newer versions, but they will become current only when they work.
 
-## UPDATE v.0.3
+### UPDATE v.0.3
 
 - The interface changed a little: the slider for the number of beads to fold is much wider now to make it easier to pinpoint a specific conformation size by the mouse.
 - Now if you change the number of beads to fold (top right corner), the plot should automatically refresh; wait a little until that happens.
 - There are new examples added from our paper on delay 1, arity 1 systems.
 
 -------------------------------------------------------
+
+## The jupyter notebook
 
 Julia packages used in the Jupyter notebook (can be installed from the notebook by uncommenting the relevant lines in the first cell):
 - Plots
