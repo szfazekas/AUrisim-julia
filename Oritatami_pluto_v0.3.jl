@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.17
+# v0.12.18
 
 using Markdown
 using InteractiveUtils
@@ -1430,7 +1430,7 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─4d0b8820-5553-11eb-11b8-995a6ca7a63f
 # ╟─cdd4c180-554c-11eb-3ac2-e125041e5bbe
 # ╠═860d64f0-48b4-11eb-265a-8364e73badce
-# ╟─158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
+# ╠═158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
 # ╟─00571140-53ee-11eb-26aa-e552dc854708
 # ╟─b4544440-5553-11eb-2984-f971c7ed1367
 # ╟─c449a7a0-5553-11eb-2d11-49cd2b88adcb
