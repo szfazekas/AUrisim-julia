@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.21
+# v0.14.0
 
 using Markdown
 using InteractiveUtils
@@ -48,7 +48,12 @@ Size of the beads on the plot: $(@bind beadsize Slider(1:30,default=4, show_valu
 # ╔═╡ c9a0b2f0-7a26-11eb-061c-5d98e104593e
 md"""
 Bead labels on/off $(@bind annotateButton CheckBox())
+``~~~~~~~~~~~~~~~~~~`` Label size: $(@bind annotatesize Slider(1:10, default=4, show_value=true))
+
 """
+
+# ╔═╡ 6de23f8d-76ee-4217-95ec-a226796b343d
+println("********************************************************************")
 
 # ╔═╡ 00571140-53ee-11eb-26aa-e552dc854708
 md"""
@@ -77,7 +82,10 @@ md"""
 Rules: $(@bind rulestext TextField((100,1),default="1=4,3=5"))
 """
 
-# ╔═╡ 2d028b50-53f0-11eb-1f6d-9757a5b16ae4
+# ╔═╡ 49281efa-3e52-407b-972e-7d8b4ff64a36
+
+
+# ╔═╡ b9431bf1-c1d0-4dad-b41d-119fc3ed4939
 
 
 # ╔═╡ 85206b10-5042-11eb-3cd7-0167883de0ae
@@ -93,7 +101,7 @@ begin
 	cutoff = 5
 	
 	# Maximum number of elongations to store for a transcript bead
-	max_elongs = 2
+	max_elongs = 20
 
 	#neighborhood = [[1,0], [1,1], [0,1], [-1,0], [-1,-1], [0,-1]]
 	
@@ -110,6 +118,8 @@ begin
 	bincountfile = "sampleOS\\bincount.auri.txt"
 	dist3file = "sampleOS\\d1a1dist3.auri.txt"
 	d1a1lowerboundfile = "sampleOS\\d1a1lowerbound.txt"
+	leftturnfile = "sampleOS\\Lturn1.auri.txt"
+	leftturnfile2 = "sampleOS\\Lturn2.auri.txt"
 	
 	if backend == "gr"
 		gr()
@@ -121,6 +131,12 @@ begin
 	### Initialization of global variables
 	"""
 end
+
+# ╔═╡ 605ce440-8ed9-11eb-3039-976810f792e3
+md"""
+Show number $(@bind confNo Slider(0:max_elongs, default=1, show_value=true))
+``~`` among the strongest conformations for the last bead
+"""
 
 # ╔═╡ 65f4fca0-49b3-11eb-2ee4-072e50d481b5
 	md"""
@@ -177,6 +193,15 @@ html"""
 </style>
 </head>
 """
+
+# ╔═╡ 615e55e1-380b-4b00-9995-f6e30720d8e4
+RGBA(colorschemes[:tab20][3],0.7)
+
+# ╔═╡ f0c5cf1b-ce08-4415-acd8-6a72383bf59c
+a=colorschemes[:tab20][3]
+
+# ╔═╡ 9ea33820-e582-4718-8eb3-3c31b72a9c6e
+RGBA(a.r, a.g, a.b, 0.8)
 
 # ╔═╡ 64b5d850-4391-11eb-0830-b72530bbf57d
 function genComb(n, k)
@@ -350,6 +375,9 @@ function loadOS(file)
 
     fseed = []
 
+    frules = Dict{String, Array{String}}()
+
+	
     for fbeadstr in split(strip(os[3]),"->")
         fbead = split(fbeadstr,",")
         push!(fseed,[string(fbead[1]), parse(Int16, fbead[2]), parse(Int16, fbead[3])])
@@ -357,11 +385,13 @@ function loadOS(file)
     
     for fbead in fseed
         fbeads[[fbead[2],fbead[3]]] = stabilized(fbead[1])
+		if !haskey(frules, fbead[1])
+			frules[fbead[1]] = []
+		end
     end
     
     ftranscript = split(strip(os[4]),",")
 
-    frules = Dict{String, Array{String}}()
     for frule in split(os[5],",")
         sides = split(frule, "=")
         if haskey(frules, sides[1])
@@ -377,6 +407,13 @@ function loadOS(file)
         end
     end
     
+	for bead in ftranscript
+		if !haskey(frules,bead)
+			frules[bead] = []
+		end
+	end
+	
+	
     return [fdelta, farity, fseed, ftranscript, frules, fbeads]
 end
 
@@ -391,8 +428,10 @@ begin
 		#os = loadOS(dist3file)
 		#os = loadOS(d1a1lowerboundfile)
 		#os = loadOS(bincountfile)
-		os = loadOS(pyramidfile)
+		#os = loadOS(pyramidfile)
 		#os = loadOS(gliderfile)
+		#os = loadOS(leftturnfile)
+		os = loadOS(leftturnfile2)
 	else
 	### Or define the OS by setting its parameters in the input boxes below
 		os = [Int16(celldelta),Int16(cellarity),cellseed,celltranscript,cellrules,cellbeads]
@@ -403,6 +442,9 @@ begin
 	#### Rerun this cell when changing the system or changing a parameter.
 	"""
 end
+
+# ╔═╡ 2d028b50-53f0-11eb-1f6d-9757a5b16ae4
+"S1" in keys(os[end-1])
 
 # ╔═╡ 321fab30-484d-11eb-3a48-bb6a1827c51d
 delta = os[1]
@@ -424,10 +466,7 @@ wideslider=HTML("<input type=\"range\"  min=\"1\" max=\"$folding_length\" value=
 # ╔═╡ 63c99630-48b8-11eb-3750-d3afc0eb2d36
 md"""
 Number of beads to plot: $plotlimit
-``~~~~~~~~~~~~~~~~~~``
-``~~~~~~~~~~~~~~~~~~``
-``~~~~~~~~~~~~~~~~~~`` Show number $(@bind confNo Slider(0:max_elongs, default=1, show_value=true))
-``~`` among the strongest conformations for the last bead
+
 """
 #@bind plotlimit Slider(1:folding_length; default=1, show_value=true)
 
@@ -489,9 +528,9 @@ function plotPath(beads::Dict{Array{Int16,1},stabilized}, fpath::Vector{Vector{I
 	to = Array{Float16,1}(undef,2)
 	
 	if annotateButton
-		annotations1 = text.(labels, :navy, :middle, 4)
+		annotations1 = text.(labels, :navy, :middle, annotatesize)
 		if (limit > length(seed)) && (confNo > 0)
-			annotations2 = text.(labels[limit:limit+delta-1], :red, :middle, 6)
+			annotations2 = text.(labels[limit:limit+delta-1], :red, :middle, annotatesize)
 		end
 	else
 		annotations1 = []
@@ -502,7 +541,9 @@ function plotPath(beads::Dict{Array{Int16,1},stabilized}, fpath::Vector{Vector{I
     minx = maxx = fpath[1][1]
     miny = maxy = fpath[1][2]
     fbeadtypes = Dict()
+	fbeadtypes1 = Dict()
     fbeadtypecount = 0
+	fbeadtypecount1 = 0
     fcolorpath = []
     if fcolored == true
         fcolors = colorschemes[:tab20]
@@ -524,7 +565,13 @@ function plotPath(beads::Dict{Array{Int16,1},stabilized}, fpath::Vector{Vector{I
                     fbeadtypes[labels[i]] = fbeadtypecount+1
                     fbeadtypecount += 1
                 end
-                push!(fcolorpath, fcolors[1+mod(fbeadtypes[labels[i]],20)])
+				if !(labels[i][1] in keys(fbeadtypes1))
+                    fbeadtypes1[labels[i][1]] = fbeadtypecount1+1
+                    fbeadtypecount1 += 1
+                end
+                #push!(fcolorpath, fcolors[1+mod(fbeadtypes[labels[i]],20)])
+				tmpcolor = fcolors[1+mod(fbeadtypes1[labels[i][1]],20)]
+				push!(fcolorpath, RGBA(tmpcolor.r, tmpcolor.g, tmpcolor.b, 1-parse(Int16,labels[i][2:end])*0.05))
             end
         end
     end
@@ -538,7 +585,7 @@ function plotPath(beads::Dict{Array{Int16,1},stabilized}, fpath::Vector{Vector{I
     
 	plt = plot(tmp1[1:end-1,1], tmp1[1:end-1,2], 
 			   color = RGBA(0.1,0.1,0.1,0.8), 
-			   linewidth = 3, 
+			   linewidth = 3+beadsize/3, 
 #			   fmt = :png,
 			   size = (canvaswidth, canvasheight))
 
@@ -822,7 +869,7 @@ function backtrackArity5x(beads::Dict{Array{Int16,1},stabilized}, path::Vector{V
               
             elseif (path[i].+dir in keys(tmpBeads)) &&  (path[i].+dir != path[i-1])  && (trans[i] in rules[tmpBeads[path[i].+dir].btype])
                 push!(solution[i-1], path[i].+dir)
-                ind = findfirst(x -> x == path[i].+dir,path)
+#                ind = findfirst(x -> x == path[i].+dir,path)
                 strength += 1
             end
         end
@@ -842,7 +889,6 @@ function findFirstx(beads::Dict{Array{Int16,1},stabilized}, pos::Vector{Int16}, 
 
     #paths = generateDeltaPathFast(beads, [pos], trans)
 	paths = genDeltaNonRec(beads, [pos], trans)
-    
     if length(paths)>10000000
 		print(length(paths))
 		return []
@@ -884,11 +930,9 @@ function findFirstx(beads::Dict{Array{Int16,1},stabilized}, pos::Vector{Int16}, 
                 maxstrength = tmp.strength
                 pushfirst!(solutions,elongation(path, deepcopy(tmp)))
                 det = true
-            elseif tmp.strength == maxstrength
+            elseif (tmp.strength == maxstrength)
                 if solutions != []
                     if !(path[2] == solutions[1].path[2])
-                        det = false
-                    elseif !(tmp.bonds[1][1] == solutions[1].bondseq.bonds[1][1])
                         det = false
                     end
                 end
@@ -1104,6 +1148,10 @@ function foldx(fbeads::Dict{Array{Int16,1},stabilized}, path::Vector{Vector{Int1
 #*******************
 		push!(strongest_elongs,tmp.el[1:min(length(tmp.el),max_elongs)])
 		if (tmp.det) #&& (arity<cutoff)
+			if length(tmp.el)==0
+				error = "Trapped at bead $(i+1) of type $(tmptr[2])"
+				break
+			end
 			beads[tmp.el[1].path[2]] = stabilized(tmptr[2])
 
 			for bond in tmp.el[1].bondseq.bonds[1][1]
@@ -1117,6 +1165,18 @@ function foldx(fbeads::Dict{Array{Int16,1},stabilized}, path::Vector{Vector{Int1
 
 		else
 			error = "Last stabilized bead: $(i+1)     at position: $(path[end])               Next delay-size transcript window: $(join(tmptr[2:end]))"
+			###############
+			#beads[tmp.el[1].path[2]] = stabilized(tmptr[2])
+
+			#for bond in tmp.el[1].bondseq.bonds[1][1]
+			#	if haskey(beads, bond)
+			#		push!(beads[tmp.el[1].path[2]].bonds, bond)
+			#		push!(beads[bond].bonds, tmp.el[1].path[2])
+			#	end
+			#end
+			#push!(path,tmp.el[1].path[2])
+			
+			###############
 			push!(labels, tmptr[2])
 			for i in tmptr[3:end]
 				push!(labels, i)
@@ -1131,7 +1191,7 @@ function foldx(fbeads::Dict{Array{Int16,1},stabilized}, path::Vector{Vector{Int1
 end
 
 # ╔═╡ 8b082da0-4391-11eb-1ee3-c70c33b4cf2e
-conformation = foldx(startbeads, path, transcript, seed[end][1], labels, folding_length);
+conformation = foldx(startbeads, path, transcript, seed[end][1], labels, folding_length)
 
 # ╔═╡ 860d64f0-48b4-11eb-265a-8364e73badce
 if (plotlimit > length(seed)) && (confNo != 0)
@@ -1498,13 +1558,13 @@ end
 genDeltaNonRec(startbeads,Vector{Vector{Int16}}([[-1,-1]]), ["5","3","0","4","1"])
 
 # ╔═╡ 57b858f0-4de9-11eb-3128-c1dded54a2e3
-#tmp = findFirstx(startbeads,Vector{Int16}([-1,-1]),["5","3","0","4","1","0","5"],[])
+#tmp = findFirstx(startbeads,Vector{Int16}([8,-5]),["S0","L0","L1","L2","L3","L4","L5","L6"])
+
+# ╔═╡ bf5088e1-9086-4cb0-8fda-954b53213e61
+startbeads;
 
 # ╔═╡ de600e92-4e41-11eb-1290-b3c24b9bcfd7
-xbeads = deepcopy(startbeads)
-
-# ╔═╡ df8308c0-4e57-11eb-0fd3-0fd5d532a2b9
-xbeads
+#xbeads = deepcopy(startbeads)
 
 # ╔═╡ 12c8ef80-4c5d-11eb-0e3e-9f50ee5fb253
 deltap=4
@@ -1545,10 +1605,10 @@ end
 #backtrackx(startbeads,Vector{Vector{Int16}}([[-1,-1],[0,-1],[1,0],[1,1]]),["5","3","0","4","1","0","4"],[])
 
 # ╔═╡ 1c811760-4c57-11eb-0631-2bf35a5ac258
-dpaths = generateDeltaTree(Dict([Int16(0),Int16(0)]=>stabilized("0")),[Int16(0),Int16(0)], ["B1","B2", "B3","B4","","","","","","","","","","","","","",""]);
+#dpaths = generateDeltaTree(Dict([Int16(0),Int16(0)]=>stabilized("0")),[Int16(0),Int16(0)], ["B1","B2", "B3","B4","","","","","","","","","","","","","",""]);
 
 # ╔═╡ df9785a0-4cab-11eb-3b40-03868856abc5
-dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], ["B1","B2", "B3","B4","","","","","","","","","","","","","",""]);
+#dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], ["B1","B2", "B3","B4","","","","","","","","","","","","","",""]);
 
 # ╔═╡ 2c372c60-4c9a-11eb-1103-03d32d695b90
 #(Base.summarysize(dpaths), Base.summarysize(dpaths2), Base.summarysize(dpaths3))
@@ -1556,12 +1616,14 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╔═╡ Cell order:
 # ╟─ea695dc0-492a-11eb-3e0e-41dea86a9123
 # ╟─f3b25b10-485e-11eb-0672-a56f14d5eaf9
+# ╟─605ce440-8ed9-11eb-3039-976810f792e3
 # ╟─63c99630-48b8-11eb-3750-d3afc0eb2d36
 # ╟─4d0b8820-5553-11eb-11b8-995a6ca7a63f
 # ╟─cdd4c180-554c-11eb-3ac2-e125041e5bbe
 # ╟─860d64f0-48b4-11eb-265a-8364e73badce
 # ╟─c9a0b2f0-7a26-11eb-061c-5d98e104593e
 # ╠═158b3b60-484d-11eb-2e0d-e73b8c2fc0cd
+# ╠═6de23f8d-76ee-4217-95ec-a226796b343d
 # ╟─00571140-53ee-11eb-26aa-e552dc854708
 # ╟─b4544440-5553-11eb-2984-f971c7ed1367
 # ╟─c449a7a0-5553-11eb-2d11-49cd2b88adcb
@@ -1569,6 +1631,8 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─d7870a12-5553-11eb-0985-c155f32da81f
 # ╟─d3ebb0a0-53ef-11eb-14ac-cf6c636d6dad
 # ╠═2d028b50-53f0-11eb-1f6d-9757a5b16ae4
+# ╠═49281efa-3e52-407b-972e-7d8b4ff64a36
+# ╠═b9431bf1-c1d0-4dad-b41d-119fc3ed4939
 # ╟─85206b10-5042-11eb-3cd7-0167883de0ae
 # ╟─321fab30-484d-11eb-3a48-bb6a1827c51d
 # ╟─350984b0-484d-11eb-1d69-8725abe363a7
@@ -1576,13 +1640,16 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─3b13d810-484d-11eb-0a83-b1982d8eb146
 # ╟─3d96d96e-484d-11eb-0293-b1e8656110fa
 # ╟─fa566620-484d-11eb-08ea-cf27826e5d58
-# ╠═8b082da0-4391-11eb-1ee3-c70c33b4cf2e
+# ╟─8b082da0-4391-11eb-1ee3-c70c33b4cf2e
 # ╠═1c870eee-7906-11eb-13f4-9f219f0e4f6b
 # ╟─1a12ca10-4391-11eb-38f3-475632625048
 # ╠═4659a0d0-4391-11eb-08bc-5f0fa8380c40
 # ╟─65f4fca0-49b3-11eb-2ee4-072e50d481b5
 # ╠═79975630-4865-11eb-1c55-290ee27b9677
 # ╟─042f7f40-5548-11eb-0f48-7bb3efca4051
+# ╠═615e55e1-380b-4b00-9995-f6e30720d8e4
+# ╠═f0c5cf1b-ce08-4415-acd8-6a72383bf59c
+# ╠═9ea33820-e582-4718-8eb3-3c31b72a9c6e
 # ╠═583db4d2-4391-11eb-2ae9-c73fd33c55a9
 # ╟─5ef33c50-4391-11eb-0042-131969fd46d8
 # ╟─64b5d850-4391-11eb-0830-b72530bbf57d
@@ -1601,7 +1668,7 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─2e35b6d0-4ddf-11eb-1ce7-b5f062c3c4eb
 # ╟─2db404b0-4dd4-11eb-0811-4ffe0855dc4f
 # ╟─4f127f70-4e73-11eb-3a5c-933eb957e069
-# ╟─b1f70610-4dce-11eb-19bb-79506dcc9c9d
+# ╠═b1f70610-4dce-11eb-19bb-79506dcc9c9d
 # ╟─f53c6de0-4e3a-11eb-365c-591d4b585e05
 # ╠═f8a981c0-4de5-11eb-237c-fd23db560e94
 # ╟─577d6900-4e7c-11eb-32bb-6b5cf76ccd14
@@ -1617,8 +1684,8 @@ dpaths3= genDeltaNonRec(Dict(zeros(Int16,2)=>stabilized("0")),[zeros(Int16,2)], 
 # ╟─a2193400-4e6b-11eb-07f5-dd856c6f5dc7
 # ╟─70a71be0-4e42-11eb-1cdb-e5592529a943
 # ╠═57b858f0-4de9-11eb-3128-c1dded54a2e3
+# ╠═bf5088e1-9086-4cb0-8fda-954b53213e61
 # ╟─de600e92-4e41-11eb-1290-b3c24b9bcfd7
-# ╟─df8308c0-4e57-11eb-0fd3-0fd5d532a2b9
 # ╟─12c8ef80-4c5d-11eb-0e3e-9f50ee5fb253
 # ╠═2cf7ccae-4dec-11eb-3c10-7f6022d1f716
 # ╠═1c811760-4c57-11eb-0631-2bf35a5ac258
